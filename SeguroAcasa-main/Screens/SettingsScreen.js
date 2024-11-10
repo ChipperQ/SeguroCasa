@@ -17,30 +17,31 @@ const Ajustes = ({ navigation }) => {
 
       {/* Opciones de ajustes */}
       <View style={styles.optionsContainer}>
-        <TouchableOpacity style={styles.option} onPress={() => { /* Navegar a la pantalla de notificaciones */ }}>
-          <Text style={styles.optionText}>Notificaciones</Text>
-          <MaterialIcons name="notifications" size={24} color="gray" />
+        
+        <TouchableOpacity 
+          style={styles.option} 
+          onPress={() => navigation.navigate('EditProfile')}
+        >
+          <Text style={styles.optionText}>Editar Perfil</Text>
+          <View>
+            <MaterialIcons name="edit" size={24} color="gray" />
+          </View>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.option} onPress={() => { /* Navegar a la pantalla de cambiar contraseña */ }}>
-          <Text style={styles.optionText}>Cambiar contraseña</Text>
-          <MaterialIcons name="lock" size={24} color="gray" />
+        <TouchableOpacity style={styles.option} onPress={() => { }}>
+          <Text style={styles.optionText}>Agregar/Editar Hijos</Text>
+          <View>
+            <MaterialIcons name="person" size={24} color="gray" />
+          </View>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.option} onPress={() => { /* Cambiar el tema a oscuro o claro */ }}>
-          <Text style={styles.optionText}>Tema oscuro</Text>
-          <MaterialIcons name="dark-mode" size={24} color="gray" />
+        <TouchableOpacity style={styles.option} onPress={() => { }}>
+          <Text style={styles.optionText}>Cerrar sesion</Text>
+          <View>
+            <MaterialIcons name="logout" size={24} color="gray" />
+          </View>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.option} onPress={() => { /* Navegar a la pantalla de cambiar idioma */ }}>
-          <Text style={styles.optionText}>Idioma</Text>
-          <MaterialIcons name="language" size={24} color="gray" />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.option} onPress={() => { /* Navegar a la pantalla de privacidad */ }}>
-          <Text style={styles.optionText}>Privacidad</Text>
-          <MaterialIcons name="security" size={24} color="gray" />
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
