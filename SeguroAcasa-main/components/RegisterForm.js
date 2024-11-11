@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { Alert, View, Text, TextInput, TouchableOpacity, ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { supabase } from '../lib/Supabase';
 import RegisterStyle from '../Styles/registerStyles'; // Importa los estilos
 
@@ -65,6 +65,7 @@ const RegisterScreen = ({ navigation }) => {
 
     if (error) {
       Alert.alert('Error de Registro', error.message);
+      
     } else {
       const { error: insertError } = await supabase
         .from('usuarios')
@@ -89,8 +90,9 @@ const RegisterScreen = ({ navigation }) => {
   };
 
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
     <ScrollView contentContainerStyle={RegisterStyle.container}>
-
+       
       <Text style={RegisterStyle.label}>Ingrese su RUT</Text>
       <TextInput
         style={[RegisterStyle.textInput, errors.rut && RegisterStyle.errorInput]}
@@ -170,6 +172,7 @@ const RegisterScreen = ({ navigation }) => {
         <Text style={RegisterStyle.buttonText}>Registrarse</Text>
       </TouchableOpacity>
     </ScrollView>
+    </TouchableWithoutFeedback>
   );
 };
 
