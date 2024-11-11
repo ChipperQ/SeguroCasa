@@ -82,7 +82,7 @@ const RegisterScreen = ({ navigation }) => {
       if (insertError) {
         Alert.alert('Error al guardar datos', insertError.message);
       } else {
-        Alert.alert('Registro Exitoso', 'Por favor verifica tu correo electrónico para confirmar tu cuenta.');
+        Alert.alert('Registro Exitoso');
         navigation.navigate('Login');
       }
     }

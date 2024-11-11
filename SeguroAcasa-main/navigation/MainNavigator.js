@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Login from '../Screens/LoginScreen'; 
 import Maps from '../Screens/maps/MapsScreen'; 
 import Register from '../Screens/RegisterScreen';
+import Settings from '../Screens/SettingsScreen';
 import TabNavigator from './TabNavigator';
 
 const Stack = createNativeStackNavigator();
