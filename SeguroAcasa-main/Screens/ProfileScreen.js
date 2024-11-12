@@ -1,8 +1,25 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, Image, SafeAreaView, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useUserInfo } from '../lib/userContext'; // Asegúrate de que la ruta sea correcta
 
 const Profile = () => {
+  // Obtenemos los datos del usuario desde el UserContext
+  const { profile } = useUserInfo();
+
+  // Si el perfil no está disponible, podemos mostrar un texto indicando que se está cargando
+  if (!profile) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar backgroundColor="white" />
+        <Text>Cargando perfil...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  // Imagen predeterminada si el usuario no tiene foto
+  const defaultProfileImage = require('../assets/images/usuario_icon.png'); // Usa tu imagen predeterminada aquí
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor="white" />
@@ -18,7 +35,7 @@ const Profile = () => {
       {/* Imagen de perfil */}
       <View style={styles.profileContainer}>
         <Image 
-          source={require('../assets/images/usuario_icon.png')} 
+          source={profile.foto_usuario ? { uri: profile.foto_usuario } : defaultProfileImage} // Comprobamos si hay foto de perfil
           style={styles.profileImage}
         />
         <Text style={styles.profileText}>Perfil</Text>
@@ -29,8 +46,8 @@ const Profile = () => {
         
         {/* Nombre del usuario */}
         <View style={styles.nameContainer}>
-          <Text style={styles.nameText}>Juan Pérez</Text>
-          <Text style={styles.usernameText}>@juanperez</Text>
+          <Text style={styles.nameText}>{profile.nombre_usuario}</Text>
+          <Text style={styles.usernameText}>@{profile.nombre_usuario}</Text>
         </View>
 
         {/* Información de contacto */}
@@ -39,17 +56,17 @@ const Profile = () => {
           
           <View style={styles.contactRow}>
             <Text style={styles.contactLabel}>Correo:</Text>
-            <Text style={styles.contactInfo}>juan.perez@example.com</Text>
+            <Text style={styles.contactInfo}>{profile.correo_usuario}</Text>
           </View>
           
           <View style={styles.contactRow}>
             <Text style={styles.contactLabel}>Teléfono:</Text>
-            <Text style={styles.contactInfo}>+56 123 456 789</Text>
+            <Text style={styles.contactInfo}>{profile.telefono}</Text>
           </View>
           
           <View style={styles.contactRow}>
             <Text style={styles.contactLabel}>Dirección:</Text>
-            <Text style={styles.contactInfo}>Calle Falsa 123, Ciudad, País</Text>
+            <Text style={styles.contactInfo}>{profile.direccion}</Text>
           </View>
         </View>
 

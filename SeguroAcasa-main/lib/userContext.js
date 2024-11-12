@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { supabase } from "./supabase";
+import { createContext, useContext, useEffect, useState } from 'react';
+import { supabase } from './Supabase'; // Asegúrate de que el archivo Supabase esté bien configurado
 
 // Crear un contexto para almacenar la sesión y el perfil del usuario
 const UserContext = createContext({
@@ -13,34 +13,70 @@ export function AuthProvider({ children }) {
     profile: null,
   });
 
+  // Obtener la sesión actual y escuchar cambios
   useEffect(() => {
-    // Obtener la sesión actual
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUserInfo({ ...userInfo, session });
+    const getSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log('Session retrieved:', session); // Verifica si la sesión se obtiene correctamente
+        setUserInfo((prevState) => ({
+          ...prevState,
+          session,
+        }));
+      } catch (error) {
+        console.error('Error getting session:', error);
+      }
+    };
+
+    // Verificamos la sesión al montar el componente
+    getSession();
+
+    // Escuchar los cambios en el estado de autenticación
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log('Auth state changed:', session); // Verifica si el evento está siendo disparado
+      setUserInfo((prevState) => ({
+        ...prevState,
+        session,
+        profile: null, // Limpiamos el perfil cuando cambia la sesión
+      }));
     });
 
-    // Escuchar cambios en el estado de autenticación
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setUserInfo({ session, profile: null });
-    });
+    // Limpiar el listener al desmontar el componente
+    return () => {
+      listener?.unsubscribe();
+    };
   }, []);
 
+  // Obtener el perfil del usuario
   const getProfile = async () => {
     if (!userInfo.session) return;
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", userInfo.session.user.id);
 
-    if (error) {
-      console.log(error);
-    } else {
-      setUserInfo({ ...userInfo, profile: data[0] });
+    try {
+      // Usamos el correo electrónico del usuario autenticado para buscar el perfil
+      const { data, error } = await supabase
+        .from('usuarios') // Usamos la tabla 'usuarios' en lugar de 'profiles'
+        .select('*') // Seleccionamos todos los campos del perfil
+        .eq('correo_usuario', userInfo.session.user.email); // Filtramos por el correo electrónico del usuario
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+      } else if (data && data.length > 0) {
+        // Si encontramos un perfil, lo almacenamos
+        setUserInfo((prevState) => ({
+          ...prevState,
+          profile: data[0], // Guardamos el primer perfil encontrado
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
     }
   };
 
+  // Llamar a getProfile cuando la sesión cambie
   useEffect(() => {
-    getProfile();
+    if (userInfo.session) {
+      getProfile();
+    }
   }, [userInfo.session]);
 
   return (
