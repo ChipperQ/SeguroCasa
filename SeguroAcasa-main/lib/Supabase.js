@@ -9,6 +9,6 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     storage: AsyncStorage,         // Usando AsyncStorage para almacenar la sesión
     autoRefreshToken: true,        // Permitir la actualización automática del token
     persistSession: true,          // Persistir la sesión incluso si la aplicación se cierra
-    detectSessionInUrl: true,     // No detectar la sesión en la URL (por si no usas Deep Linking)
+    detectSessionInUrl: false,     // No detectar la sesión en la URL (por si no usas Deep Linking)
   },
 });

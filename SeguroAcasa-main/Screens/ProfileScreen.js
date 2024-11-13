@@ -1,14 +1,13 @@
 import React, { useEffect } from 'react';
-import { View, Text, Image, SafeAreaView, StyleSheet } from 'react-native';
+import { View, Text, Image, TextInput, SafeAreaView, StyleSheet, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { useUserInfo } from '../lib/userContext'; // Asegúrate de que la ruta sea correcta
+import { useAuth } from '../lib/userContext'; // Asegúrate de importar correctamente el nuevo contexto
+import { Ionicons } from '@expo/vector-icons'; // Para los íconos de los campos
 
 const Profile = () => {
-  // Obtenemos los datos del usuario desde el UserContext
-  const { profile } = useUserInfo();
+  const { profile, loading } = useAuth(); 
 
-  // Si el perfil no está disponible, podemos mostrar un texto indicando que se está cargando
-  if (!profile) {
+  if (loading) {
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar backgroundColor="white" />
@@ -17,14 +16,22 @@ const Profile = () => {
     );
   }
 
-  // Imagen predeterminada si el usuario no tiene foto
-  const defaultProfileImage = require('../assets/images/usuario_icon.png'); // Usa tu imagen predeterminada aquí
+  if (!profile) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar backgroundColor="white" />
+        <Text>No se ha encontrado el perfil.</Text>
+      </SafeAreaView>
+    );
+  }
+
+  const defaultProfileImage = require('../assets/images/usuario_icon.png');
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor="white" />
       
-      {/* Fondo superior */}
+      {/* Fondo superior usando la imagen existente */}
       <View style={styles.backgroundContainer}>
         <Image 
           source={require('../assets/images/Fondo.jpg')} 
@@ -32,48 +39,56 @@ const Profile = () => {
         />
       </View>
 
-      {/* Imagen de perfil */}
+      {/* Imagen de perfil con icono de cámara */}
       <View style={styles.profileContainer}>
         <Image 
-          source={profile.foto_usuario ? { uri: profile.foto_usuario } : defaultProfileImage} // Comprobamos si hay foto de perfil
+          source={profile.foto_usuario ? { uri: profile.foto_usuario } : defaultProfileImage}
           style={styles.profileImage}
         />
-        <Text style={styles.profileText}>Perfil</Text>
+        <TouchableOpacity style={styles.cameraIconContainer}>
+          <Ionicons name="camera" size={24} color="#fff" />
+        </TouchableOpacity>
       </View>
 
       {/* Información del usuario */}
       <View style={styles.infoContainer}>
         
-        {/* Nombre del usuario */}
-        <View style={styles.nameContainer}>
-          <Text style={styles.nameText}>{profile.nombre_usuario}</Text>
-          <Text style={styles.usernameText}>@{profile.nombre_usuario}</Text>
+        {/* Campo de usuario */}
+        <View style={styles.inputContainer}>
+          <Ionicons name="person-outline" size={20} color="#8A2BE2" />
+          <TextInput style={styles.input} placeholder="Username" value={profile.nombre_usuario} />
         </View>
 
-        {/* Información de contacto */}
-        <View style={styles.contactContainer}>
-          <Text style={styles.contactHeader}>Información de contacto</Text>
-          
-          <View style={styles.contactRow}>
-            <Text style={styles.contactLabel}>Correo:</Text>
-            <Text style={styles.contactInfo}>{profile.correo_usuario}</Text>
-          </View>
-          
-          <View style={styles.contactRow}>
-            <Text style={styles.contactLabel}>Teléfono:</Text>
-            <Text style={styles.contactInfo}>{profile.telefono}</Text>
-          </View>
-          
-          <View style={styles.contactRow}>
-            <Text style={styles.contactLabel}>Dirección:</Text>
-            <Text style={styles.contactInfo}>{profile.direccion}</Text>
-          </View>
+        {/* Fecha de nacimiento */}
+        <View style={styles.inputContainer}>
+          <Ionicons name="calendar-outline" size={20} color="#8A2BE2" />
+          <TextInput style={styles.input} placeholder="Date of Birth" value={profile.fecha_nacimiento} />
         </View>
 
-        {/* Pie de página */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Miembro desde 2020</Text>
+        {/* Género */}
+        <View style={styles.inputContainer}>
+          <Ionicons name="male-female-outline" size={20} color="#8A2BE2" />
+          <TextInput style={styles.input} placeholder="Gender" value={profile.genero} />
         </View>
+
+        {/* Correo o teléfono */}
+        <View style={styles.inputContainer}>
+          <Ionicons name="mail-outline" size={20} color="#8A2BE2" />
+          <TextInput style={styles.input} placeholder="Email or Phone number" value={profile.correo_usuario} />
+        </View>
+
+        {/* Contraseña */}
+        <View style={styles.inputContainer}>
+          <Ionicons name="lock-closed-outline" size={20} color="#8A2BE2" />
+          <TextInput style={styles.input} placeholder="Password" secureTextEntry={true} />
+        </View>
+      </View>
+
+      {/* Redes sociales */}
+      <View style={styles.socialMediaContainer}>
+        <Ionicons name="logo-google" size={24} color="#8A2BE2" />
+        <Ionicons name="logo-facebook" size={24} color="#8A2BE2" />
+        <Ionicons name="logo-twitter" size={24} color="#8A2BE2" />
       </View>
     </SafeAreaView>
   );
@@ -82,77 +97,65 @@ const Profile = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F0F0F0',
   },
   backgroundContainer: {
     width: '100%',
-    height: 228,
+    height: 200,
   },
   backgroundImage: {
     height: '100%',
     width: '100%',
+    resizeMode: 'cover',
   },
   profileContainer: {
+    position: 'absolute',
+    top: 100,
+    width: '100%',
     alignItems: 'center',
-    marginTop: -75,
   },
   profileImage: {
-    height: 155,
-    width: 155,
-    borderRadius: 999,
-    borderWidth: 2,
-    borderColor: 'black',
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 3,
+    borderColor: '#fff',
   },
-  profileText: {
-    marginTop: 10,
-    fontSize: 20,
+  cameraIconContainer: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+    backgroundColor: '#8A2BE2',
+    borderRadius: 20,
+    padding: 5,
   },
   infoContainer: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
-    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    marginTop: 160, // Separación para que los campos se ubiquen debajo de la foto de perfil
   },
-  nameContainer: {
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  nameText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  usernameText: {
-    fontSize: 16,
-    color: 'gray',
-  },
-  contactContainer: {
-    paddingHorizontal: 10,
-  },
-  contactHeader: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 10,
-  },
-  contactRow: {
+  inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    backgroundColor: '#fff',
+    borderRadius: 25,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    marginVertical: 5,
+    borderWidth: 1,
+    borderColor: '#8A2BE2',
   },
-  contactLabel: {
-    fontSize: 16,
-    color: 'gray',
-  },
-  contactInfo: {
-    fontSize: 16,
+  input: {
     marginLeft: 10,
+    fontSize: 16,
+    color: '#333',
+    flex: 1,
   },
-  footer: {
-    marginTop: 30,
-    alignItems: 'center',
-  },
-  footerText: {
-    textAlign: 'center',
-    color: 'gray',
+  socialMediaContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingHorizontal: 60,
+    paddingVertical: 20,
   },
 });
 
