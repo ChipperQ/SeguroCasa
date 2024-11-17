@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from './Supabase'; // Asegúrate de que el archivo Supabase esté bien configurado
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Importar AsyncStorage
 
 // Crear un contexto para almacenar la sesión y el perfil del usuario
 const AuthContext = createContext({
@@ -7,6 +8,7 @@ const AuthContext = createContext({
   profile: null,
   loading: true,
   isAdmin: false,
+  signOut: async () => {}, // Función para cerrar sesión
 });
 
 export function AuthProvider({ children }) {
@@ -24,7 +26,7 @@ export function AuthProvider({ children }) {
         if (session) {
           // Si hay sesión, obtener el perfil del usuario
           const { data, error } = await supabase
-            .from('usuarios')  // Cambiar a la tabla correcta
+            .from('usuarios') // Cambiar a la tabla correcta
             .select('*')
             .eq('correo_usuario', session.user.email)
             .single();
@@ -48,9 +50,9 @@ export function AuthProvider({ children }) {
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setProfile(null); // Limpiar perfil cuando cambia la sesión
-      setLoading(true);  // Reiniciar estado de carga
+      setLoading(true); // Reiniciar estado de carga
       if (session) {
-        fetchSession();  // Reobtenemos el perfil si hay sesión
+        fetchSession(); // Reobtenemos el perfil si hay sesión
       } else {
         setLoading(false);
       }
@@ -62,8 +64,29 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
+  // Función para cerrar sesión
+  const signOut = async () => {
+    try {
+      // Llamada a Supabase para cerrar sesión
+      await supabase.auth.signOut();
+      // Limpiar el estado local
+      setSession(null);
+      setProfile(null);
+      // Limpiar AsyncStorage
+      await AsyncStorage.clear();
+    } catch (error) {
+      console.error('Error during sign-out:', error);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ session, profile, loading, isAdmin: profile?.group === 'ADMIN' }}>
+    <AuthContext.Provider value={{ 
+      session, 
+      profile, 
+      loading, 
+      isAdmin: profile?.group === 'ADMIN', 
+      signOut, // Pasar la función signOut al contexto
+    }}>
       {children}
     </AuthContext.Provider>
   );
